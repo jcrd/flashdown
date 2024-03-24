@@ -1,4 +1,5 @@
 import argparse
+import random
 
 import mistune
 
@@ -42,8 +43,13 @@ class CardsFile:
 
             self.cards.append(Card(front_child["children"][0]["raw"], back))
 
-    def prompt(self):
-        for card in self.cards:
+    def prompt(self, randomize=False):
+        cards = (
+            sorted(self.cards, key=lambda _: random.random())
+            if randomize
+            else self.cards
+        )
+        for card in cards:
             print("Q:", card.front, end="")
             input()
             print("A:")
@@ -57,7 +63,8 @@ if __name__ == "__main__":
         prog="flashdown", description="Transform markdown lists into flashcards"
     )
     parser.add_argument("filename")
+    parser.add_argument("-r", "--randomize", action="store_true")
 
     args = parser.parse_args()
 
-    CardsFile(args.filename).prompt()
+    CardsFile(args.filename).prompt(args.randomize)
